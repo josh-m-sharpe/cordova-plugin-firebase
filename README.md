@@ -11,7 +11,7 @@ Thank you for your support!
 ## in this fork
 ### verifyPhoneNumber (Android only)
 
-Request a verificationId and send a SMS with a verificatioCode.
+Request a verificationId and send a SMS with a verificationCode.
 Use them to construct a credenial to sign in the user (in your app).
 https://firebase.google.com/docs/auth/android/phone-auth
 https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
@@ -29,7 +29,7 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
     var code = inputField.value.toString();
 
     var verificationId = credential.verificationId;
-    
+
     var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
     firebase.auth().signInWithCredential(signInCredential);
 }, function(error) {
@@ -42,11 +42,11 @@ See npm package for versions - https://www.npmjs.com/package/cordova-plugin-fire
 
 Install the plugin by adding it your project's config.xml:
 ```
-<plugin name="cordova-plugin-firebase" spec="0.1.24" />
+<plugin name="cordova-plugin-firebase" spec="0.1.25" />
 ```
 or by running:
 ```
-cordova plugin add cordova-plugin-firebase@0.1.24 --save
+cordova plugin add cordova-plugin-firebase@0.1.25 --save
 ```
 Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
 
@@ -274,9 +274,17 @@ window.FirebasePlugin.setUserProperty("name", "value");
 
 Fetch Remote Config parameter values for your app:
 ```
-window.FirebasePlugin.fetch();
+window.FirebasePlugin.fetch(function () {
+    // success callback
+}, function () {
+    // error callback
+});
 // or, specify the cacheExpirationSeconds
-window.FirebasePlugin.fetch(600);
+window.FirebasePlugin.fetch(600, function () {
+    // success callback
+}, function () {
+    // error callback
+});
 ```
 
 ### activateFetched
@@ -342,6 +350,10 @@ window.FirebasePlugin.getInfo(function(info) {
     // the timestamp (milliseconds since epoch) of the last successful fetch
     console.log(info.fetchTimeMillis);
     // the status of the most recent fetch attempt (int)
+    // 0 = Config has never been fetched.
+    // 1 = Config fetch succeeded.
+    // 2 = Config fetch failed.
+    // 3 = Config fetch was throttled.
     console.log(info.lastFetchStatus);
 }, function(error) {
     console.error(error);
@@ -381,12 +393,36 @@ window.FirebasePlugin.setDefaults(defaults);
 window.FirebasePlugin.setDefaults(defaults, "namespace");
 ```
 
+### startTrace
+
+Start a trace.
+
+```
+window.FirebasePlugin.startTrace("test trace", success, error);
+```
+
+### incrementCounter
+
+To count the performance-related events that occur in your app (such as cache hits or retries), add a line of code similar to the following whenever the event occurs, using a string other than retry to name that event if you are counting a different type of event:
+
+```
+window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
+```
+
+### stopTrace
+
+Stop the trace
+
+```
+window.FirebasePlugin.stopTrace("test trace");
+```
+
 ### Phone Authentication
 **BASED ON THE CONTRIBUTIONS OF**
-IOS 
-https://github.com/silverio/cordova-plugin-
+IOS
+https://github.com/silverio/cordova-plugin-firebase
 
-ANDROID 
+ANDROID
 https://github.com/apptum/cordova-plugin-firebase
 
 **((((IOS))): SETUP YOUR PUSH NOTIFICATIONS FIRST, AND VERIFY THAT THEY ARE ARRIVING TO YOUR PHYSICAL DEVICE BEFORE YOU TEST THIS METHOD. USE THE APNS AUTH KEY TO GENERATE THE .P8 FILE AND UPLOAD IT TO FIREBASE.
@@ -397,7 +433,7 @@ This method sends an SMS to the user with the SMS_code and gets the verification
 ```
 window.FirebasePlugin.getVerificationID("+573123456789",function(id) {
                 console.log("verificationID: "+id);
-                
+
             }, function(error) {             
                 console.error(error);
             });
